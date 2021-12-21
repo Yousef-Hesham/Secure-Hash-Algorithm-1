@@ -88,11 +88,13 @@ void sha1::perform_sha1(uint32_t digest[], uint32_t block[], uint64_t& transform
             f = b ^ c ^ d;
             k = 0xCA62C1D6;
         }
+
+
         if (i <= 15) {
-            temp = (a << 5) + f + e + k + block[i];
+            temp = left_rotate(a,5) + f + e + k + block[i];
         }
         else {
-            temp = (a << 5) + f + e + k + extend(block, i);
+            temp = left_rotate(a,5) + f + e + k + extend(block, i);
         }
         //temp = (a << 5) + f + e + k + blk(block, i);
         e = d;
