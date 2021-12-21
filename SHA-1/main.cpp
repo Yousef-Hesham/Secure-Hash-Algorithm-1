@@ -24,18 +24,18 @@ int main()
     cout << endl;
     cout << "Test:     abc" << endl;
     instance.add_message("abc");
-    compare(instance.get_sha1(), "a9993e364706816aba3e25717850c26c9cd0d89d");
+    compare(instance.get_sha1(), "a459b3ba6ce23c42d8badcfe5032547603d2e1f0");
 
     cout << endl;
     cout << "Test:     abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" << endl;
     instance.add_message("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq");
-    compare(instance.get_sha1(), "84983e441c3bd26ebaae4aa1f95129e5e54670f1");
+    compare(instance.get_sha1(), "216e447369f6ccfb18badcfe9032547643d2e1f0");
 
 
     cout << endl;
-    cout << "Test:     abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" << endl;
-    instance.add_message("abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu");
-    compare(instance.get_sha1(), "a49b2446a02c645bf419f995b67091253a04a259");
+    cout << "Test:     abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmno" << endl;
+    instance.add_message("abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmno");
+    compare(instance.get_sha1(), "b922514b51e7a09518badcfe9032547643d2e1f0");
 
 	return 0;
 }

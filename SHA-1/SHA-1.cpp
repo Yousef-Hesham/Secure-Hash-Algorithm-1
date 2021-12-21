@@ -42,57 +42,17 @@ void sha1::reset()
     transforms_num = 0;
 }
 
-uint32_t sha1::rol(const uint32_t value, const size_t bits)
+uint32_t sha1::left_rotate(const uint32_t value, const size_t bits)
 {
-    return (value << bits) | (value >> (32 - bits));
+    return (value << bits);
 }
 
-
-uint32_t sha1::blk(const uint32_t block[BLOCK_INTS], const size_t i)
+uint32_t sha1::extend(const uint32_t block[], const size_t i)
 {
-    return rol(block[(i + 13) & 15] ^ block[(i + 8) & 15] ^ block[(i + 2) & 15] ^ block[i], 1);
+    return left_rotate(block[i-3] ^ block[i-8] ^ block[i-14] ^ block[i-16], 1);
 }
 
-
-void sha1::R0(const uint32_t block[BLOCK_INTS], const uint32_t v, uint32_t& w, const uint32_t x, const uint32_t y, uint32_t& z, const size_t i)
-{
-    z += ((w & (x ^ y)) ^ y) + block[i] + 0x5a827999 + rol(v, 5);
-    w = rol(w, 30);
-}
-
-void sha1::R1(uint32_t block[BLOCK_INTS], const uint32_t v, uint32_t& w, const uint32_t x, const uint32_t y, uint32_t& z, const size_t i)
-{
-    block[i] = blk(block, i);
-    z += ((w & (x ^ y)) ^ y) + block[i] + 0x5a827999 + rol(v, 5);
-    w = rol(w, 30);
-}
-
-
-void sha1::R2(uint32_t block[BLOCK_INTS], const uint32_t v, uint32_t& w, const uint32_t x, const uint32_t y, uint32_t& z, const size_t i)
-{
-    block[i] = blk(block, i);
-    z += (w ^ x ^ y) + block[i] + 0x6ed9eba1 + rol(v, 5);
-    w = rol(w, 30);
-}
-
-
-void sha1::R3(uint32_t block[BLOCK_INTS], const uint32_t v, uint32_t& w, const uint32_t x, const uint32_t y, uint32_t& z, const size_t i)
-{
-    block[i] = blk(block, i);
-    z += (((w | x) & y) | (w & x)) + block[i] + 0x8f1bbcdc + rol(v, 5);
-    w = rol(w, 30);
-}
-
-
-void sha1::R4(uint32_t block[BLOCK_INTS], const uint32_t v, uint32_t& w, const uint32_t x, const uint32_t y, uint32_t& z, const size_t i)
-{
-    block[i] = blk(block, i);
-    z += (w ^ x ^ y) + block[i] + 0xca62c1d6 + rol(v, 5);
-    w = rol(w, 30);
-}
-
-
-void sha1::perform_sha1(uint32_t digest[], uint32_t block[BLOCK_INTS], uint64_t& transforms)
+void sha1::perform_sha1(uint32_t digest[], uint32_t block[], uint64_t& transforms)
 {
     /* Copy digest[] to working vars */
     uint32_t a = digest[0];
@@ -101,87 +61,48 @@ void sha1::perform_sha1(uint32_t digest[], uint32_t block[BLOCK_INTS], uint64_t&
     uint32_t d = digest[3];
     uint32_t e = digest[4];
 
-    /* 4 rounds of 20 operations each. Loop unrolled. */
-    R0(block, a, b, c, d, e, 0);
-    R0(block, e, a, b, c, d, 1);
-    R0(block, d, e, a, b, c, 2);
-    R0(block, c, d, e, a, b, 3);
-    R0(block, b, c, d, e, a, 4);
-    R0(block, a, b, c, d, e, 5);
-    R0(block, e, a, b, c, d, 6);
-    R0(block, d, e, a, b, c, 7);
-    R0(block, c, d, e, a, b, 8);
-    R0(block, b, c, d, e, a, 9);
-    R0(block, a, b, c, d, e, 10);
-    R0(block, e, a, b, c, d, 11);
-    R0(block, d, e, a, b, c, 12);
-    R0(block, c, d, e, a, b, 13);
-    R0(block, b, c, d, e, a, 14);
-    R0(block, a, b, c, d, e, 15);
-    R1(block, e, a, b, c, d, 0);
-    R1(block, d, e, a, b, c, 1);
-    R1(block, c, d, e, a, b, 2);
-    R1(block, b, c, d, e, a, 3);
-    R2(block, a, b, c, d, e, 4);
-    R2(block, e, a, b, c, d, 5);
-    R2(block, d, e, a, b, c, 6);
-    R2(block, c, d, e, a, b, 7);
-    R2(block, b, c, d, e, a, 8);
-    R2(block, a, b, c, d, e, 9);
-    R2(block, e, a, b, c, d, 10);
-    R2(block, d, e, a, b, c, 11);
-    R2(block, c, d, e, a, b, 12);
-    R2(block, b, c, d, e, a, 13);
-    R2(block, a, b, c, d, e, 14);
-    R2(block, e, a, b, c, d, 15);
-    R2(block, d, e, a, b, c, 0);
-    R2(block, c, d, e, a, b, 1);
-    R2(block, b, c, d, e, a, 2);
-    R2(block, a, b, c, d, e, 3);
-    R2(block, e, a, b, c, d, 4);
-    R2(block, d, e, a, b, c, 5);
-    R2(block, c, d, e, a, b, 6);
-    R2(block, b, c, d, e, a, 7);
-    R3(block, a, b, c, d, e, 8);
-    R3(block, e, a, b, c, d, 9);
-    R3(block, d, e, a, b, c, 10);
-    R3(block, c, d, e, a, b, 11);
-    R3(block, b, c, d, e, a, 12);
-    R3(block, a, b, c, d, e, 13);
-    R3(block, e, a, b, c, d, 14);
-    R3(block, d, e, a, b, c, 15);
-    R3(block, c, d, e, a, b, 0);
-    R3(block, b, c, d, e, a, 1);
-    R3(block, a, b, c, d, e, 2);
-    R3(block, e, a, b, c, d, 3);
-    R3(block, d, e, a, b, c, 4);
-    R3(block, c, d, e, a, b, 5);
-    R3(block, b, c, d, e, a, 6);
-    R3(block, a, b, c, d, e, 7);
-    R3(block, e, a, b, c, d, 8);
-    R3(block, d, e, a, b, c, 9);
-    R3(block, c, d, e, a, b, 10);
-    R3(block, b, c, d, e, a, 11);
-    R4(block, a, b, c, d, e, 12);
-    R4(block, e, a, b, c, d, 13);
-    R4(block, d, e, a, b, c, 14);
-    R4(block, c, d, e, a, b, 15);
-    R4(block, b, c, d, e, a, 0);
-    R4(block, a, b, c, d, e, 1);
-    R4(block, e, a, b, c, d, 2);
-    R4(block, d, e, a, b, c, 3);
-    R4(block, c, d, e, a, b, 4);
-    R4(block, b, c, d, e, a, 5);
-    R4(block, a, b, c, d, e, 6);
-    R4(block, e, a, b, c, d, 7);
-    R4(block, d, e, a, b, c, 8);
-    R4(block, c, d, e, a, b, 9);
-    R4(block, b, c, d, e, a, 10);
-    R4(block, a, b, c, d, e, 11);
-    R4(block, e, a, b, c, d, 12);
-    R4(block, d, e, a, b, c, 13);
-    R4(block, c, d, e, a, b, 14);
-    R4(block, b, c, d, e, a, 15);
+    /* 4 rounds of 20 operations each. */
+
+    uint32_t f, k, temp;
+
+    for (int i = 0; i < 80; i++)
+    {
+        if (0 <= i <= 19)
+        {
+            f = (b & c) | ((!b) & d);
+            //f = d ^ (b & (c ^ d));
+            k = 0x5A827999;
+        }
+        else if (20 <= i <= 39)
+        {
+            f = b ^ c ^ d;
+            k = 0x6ED9EBA1;
+        }
+        else if (40 <= i <= 59)
+        {
+            f = (b & c) | (b & d) | (c & d);
+            k = 0x8F1BBCDC;
+        }
+        else if (60 <= i <= 79)
+        {
+            f = b ^ c ^ d;
+            k = 0xCA62C1D6;
+        }
+        if (i <= 15) {
+            temp = (a << 5) + f + e + k + block[i];
+        }
+        else {
+            temp = (a << 5) + f + e + k + extend(block, i);
+        }
+        //temp = (a << 5) + f + e + k + blk(block, i);
+        e = d;
+        d = c;
+        c = left_rotate(b, 30);
+        b = a;
+        a = temp;
+    }
+
+
 
     /* Add the working vars back into digest[] */
     digest[0] += a;

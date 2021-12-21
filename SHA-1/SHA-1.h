@@ -20,8 +20,8 @@ private:
 
 
     void sha1::reset();
-    uint32_t sha1::rol(const uint32_t value, const size_t bits);
-    uint32_t sha1::blk(const uint32_t block[BLOCK_INTS], const size_t i);
+    uint32_t sha1::left_rotate(const uint32_t value, const size_t bits);
+    uint32_t sha1::extend(const uint32_t block[BLOCK_INTS], const size_t i);
     void sha1::buffer_to_block(const std::string& buffer, uint32_t block[BLOCK_INTS]);
     void sha1::R0(const uint32_t block[BLOCK_INTS], const uint32_t v, uint32_t& w, const uint32_t x, const uint32_t y, uint32_t& z, const size_t i);
     void sha1::R1(uint32_t block[BLOCK_INTS], const uint32_t v, uint32_t& w, const uint32_t x, const uint32_t y, uint32_t& z, const size_t i);
